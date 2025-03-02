@@ -72,4 +72,4 @@ pytest test_project.py
  
 # 🔐 Password Manager  
 
-#### Enjoy and stay secure with Farah 🐈
+#### Enjoy and stay secure with Farah 🐈
