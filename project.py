@@ -94,7 +94,7 @@ def main():
             if passwords:
                 for account, encrypted_password in passwords:
                     decrypted_password = decrypt_password(encrypted_password, key)
-                    print(f"🔹 {account}: {decrypted_password}")
+                    print(f"{account}: {decrypted_password}")
             else:
                 print("No passwords stored.")
 
