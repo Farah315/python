@@ -4,21 +4,17 @@ import string
 import os
 from cryptography.fernet import Fernet
 
-# Function to generate and save encryption key
 def generate_and_save_key():
     key = Fernet.generate_key()
     with open("secret.key", "wb") as key_file:
         key_file.write(key)
 
-# Ensure the key file exists
 if not os.path.exists("secret.key"):
     generate_and_save_key()
 
-# Load encryption key
 def load_key():
     return open("secret.key", "rb").read()
 
-# Password encryption and decryption
 def encrypt_password(password, key):
     f = Fernet(key)
     return f.encrypt(password.encode())
@@ -27,18 +23,15 @@ def decrypt_password(encrypted_password, key):
     f = Fernet(key)
     return f.decrypt(encrypted_password).decode()
 
-# Generate a strong password
 def generate_strong_password(length=16):
     characters = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choice(characters) for _ in range(length))
 
-# Database Management
 def create_db():
     with sqlite3.connect("passwords.db") as conn:
         conn.execute('''CREATE TABLE IF NOT EXISTS passwords
                         (account TEXT PRIMARY KEY, password TEXT)''')
 
-# Save password to database
 def save_password_to_db(account, encrypted_password):
     with sqlite3.connect("passwords.db") as conn:
         cursor = conn.cursor()
@@ -49,14 +42,12 @@ def save_password_to_db(account, encrypted_password):
             conn.execute("INSERT INTO passwords (account, password) VALUES (?, ?)", (account, encrypted_password))
             print(f"Password for account '{account}' has been saved.")
 
-# Load all stored passwords
 def load_passwords_from_db():
     with sqlite3.connect("passwords.db") as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT account, password FROM passwords")
         return cursor.fetchall()
 
-# Delete a password from the database
 def delete_password(account):
     with sqlite3.connect("passwords.db") as conn:
         cursor = conn.cursor()

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4">
+    <div class="language-switcher fixed top-4 right-4 z-10 flex gap-2">
+        <button class="lang-btn px-4 py-2 bg-white/90 rounded-full text-sm font-semibold hover:bg-white hover:-translate-y-0.5 transition-all" onclick="app.switchLanguage('ar')">العربية</button>
+        <button class="lang-btn px-4 py-2 bg-white/90 rounded-full text-sm font-semibold hover:bg-white hover:-translate-y-0.5 transition-all" onclick="app.switchLanguage('en')">English</button>
+    </div>
+
+    <div class="container bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6 w-full max-w-2xl">
+        <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800 mb-6">🔐 مدير كلمات المرور</h1>
+        
+        <div class="tabs flex justify-center gap-2 mb-6 bg-gray-100 rounded-lg p-2 flex-wrap">
+            <button class="tab px-4 py-2 rounded-md text-gray-600 font-semibold hover:bg-indigo-500 hover:text-white transition-all" onclick="app.switchTab('generate')" id="tab-generate">إنشاء كلمة مرور</button>
+            <button class="tab px-4 py-2 rounded-md text-gray-600 font-semibold hover:bg-indigo-500 hover:text-white transition-all" onclick="app.switchTab('save')" id="tab-save">حفظ كلمة مرور</button>
+            <button class="tab px-4 py-2 rounded-md text-gray-600 font-semibold hover:bg-indigo-500 hover:text-white transition-all" onclick="app.switchTab('view')" id="tab-view">عرض كلمات المرور</button>
+            <button class="tab px-4 py-2 rounded-md text-gray-600 font-semibold hover:bg-indigo-500 hover:text-white transition-all" onclick="app.switchTab('manage')" id="tab-manage">إدارة كلمات المرور</button>
+        </div>
+
+        <div id="alerts" class="mb-4"></div>
+
+        <div id="generate-content" class="tab-content">
+            <div class="password-generator bg-gray-50 rounded-lg p-4">
+                <h3 id="generator-title" class="text-xl font-semibold text-gray-700 mb-4">مولد كلمات المرور</h3>
+                <div class="form-group mb-4">
+                    <label for="password-length" id="length-label" class="block text-gray-600 font-medium mb-2">طول كلمة المرور: <span id="length-value">16</span></label>
+                    <input type="range" id="password-length" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer" min="8" max="50" value="16">
+                </div>
+                <div class="generator-options grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="checkbox-group flex items-center gap-2">
+                        <input type="checkbox" id="include-uppercase" checked>
+                        <label for="include-uppercase" id="uppercase-label" class="text-gray-600">أحرف كبيرة (A-Z)</label>
+                    </div>
+                    <div class="checkbox-group flex items-center gap-2">
+                        <input type="checkbox" id="include-lowercase" checked>
+                        <label for="include-lowercase" id="lowercase-label" class="text-gray-600">أحرف صغيرة (a-z)</label>
+                    </div>
+                    <div class="checkbox-group flex items-center gap-2">
+                        <input type="checkbox" id="include-numbers" checked>
+                        <label for="include-numbers" id="numbers-label" class="text-gray-600">أرقام (0-9)</label>
+                    </div>
+                    <div class="checkbox-group flex items-center gap-2">
+                        <input type="checkbox" id="include-symbols" checked>
+                        <label for="include-symbols" id="symbols-label" class="text-gray-600">رموز (!@#$)</label>
+                    </div>
+                </div>
+                <button class="btn w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 hover:-translate-y-0.5 transition-all" onclick="app.generatePassword()" id="generate-btn">إنشاء كلمة مرور</button>
+                <div id="generated-password" class="mt-4 hidden">
+                    <div class="form-group mb-4">
+                        <label id="generated-label" class="block text-gray-600 font-medium mb-2">كلمة المرور المولدة:</label>
+                        <div class="password-display bg-gray-100 p-2 rounded font-mono text-gray-800" id="password-output"></div>
+                        <div id="password-strength-info" class="mt-2"></div>
+                        <button class="btn w-full bg-indigo-500 text-white py-2 rounded-lg mt-2 hover:bg-indigo-600 hover:-translate-y-0.5 transition-all" onclick="app.copyPassword()" id="copy-btn">نسخ كلمة المرور</button>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="generate-account" id="account-optional-label" class="block text-gray-600 font-medium mb-2">اسم الحساب (اختياري):</label>
+                        <input type="text" id="generate-account" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" placeholder="مثال: Gmail, Facebook">
+                    </div>
+                    <button class="btn w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 hover:-translate-y-0.5 transition-all" onclick="app.saveGeneratedPassword()" id="save-generated-btn">حفظ كلمة المرور</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="save-content" class="tab-content hidden">
+            <div class="form-group mb-4">
+                <label for="save-account" id="save-account-label" class="block text-gray-600 font-medium mb-2">اسم الحساب:</label>
+                <input type="text" id="save-account" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" placeholder="مثال: Gmail, Facebook" required>
+            </div>
+            <div class="form-group mb-4">
+                <label for="save-password" id="save-password-label" class="block text-gray-600 font-medium mb-2">كلمة المرور:</label>
+                <div class="flex gap-2">
+                    <input type="password" id="save-password" class="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" placeholder="أدخل كلمة المرور" required>
+                    <button type="button" class="btn bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-all" onclick="app.togglePasswordVisibility('save-password')" id="toggle-save-btn">إظهار/إخفاء</button>
+                </div>
+            </div>
+            <button class="btn w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 hover:-translate-y-0.5 transition-all" onclick="app.savePassword()" id="save-btn">حفظ كلمة المرور</button>
+        </div>
+
+        <div id="view-content" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="stored-passwords-title" class="text-xl font-semibold text-gray-700">كلمات المرور المحفوظة</h3>
+                <button class="btn bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-all" onclick="app.loadPasswords()" id="refresh-btn">تحديث</button>
+            </div>
+            <div class="form-group mb-4">
+                <input type="text" id="search-input" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" placeholder="البحث في كلمات المرور..." onkeyup="app.searchPasswords()">
+            </div>
+            <div id="passwords-list" class="password-list bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto"></div>
+        </div>
+
+        <div id="manage-content" class="tab-content hidden">
+            <div class="form-group mb-4">
+                <label for="manage-account" id="select-account-label" class="block text-gray-600 font-medium mb-2">اختر الحساب:</label>
+                <select id="manage-account" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" onchange="app.loadAccountData()">
+                    <option value="" id="select-account-option">-- اختر حساب --</option>
+                </select>
+            </div>
+            <div id="edit-form" class="hidden">
+                <div class="form-group mb-4">
+                    <label for="edit-account" id="new-account-label" class="block text-gray-600 font-medium mb-2">اسم الحساب الجديد:</label>
+                    <input type="text" id="edit-account" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="form-group mb-4">
+                    <label for="edit-password" id="new-password-label" class="block text-gray-600 font-medium mb-2">كلمة المرور الجديدة:</label>
+                    <div class="flex gap-2">
+                        <input type="password" id="edit-password" class="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500">
+                        <button type="button" class="btn bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-all" onclick="app.togglePasswordVisibility('edit-password')" id="toggle-edit-btn">إظهار/إخفاء</button>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn flex-1 bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 hover:-translate-y-0.5 transition-all" onclick="app.updatePassword()" id="update-btn">تحديث كلمة المرور</button>
+                    <button class="btn flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 hover:-translate-y-0.5 transition-all" onclick="app.deletePassword()" id="delete-btn">حذف كلمة المرور</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
