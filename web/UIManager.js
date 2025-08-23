@@ -6,14 +6,14 @@ export class UIManager {
     }
 
     initUI() {
-        this.updateLanguage('ar');
+        this.updateLanguage('en');
         this.switchTab('generate');
         this.loadPasswords();
     }
 
     updateLanguage(lang) {
         document.documentElement.lang = lang;
-        document.body.className = `min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4 ${lang}`;
+        document.body.className = `min-h-screen bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center p-4`;
         const elements = document.querySelectorAll('[id$="-label"], [id$="-btn"], [id$="-title"], [id$="-option"], [id$="-input"]');
         elements.forEach(element => {
             const key = element.id.replace(/-label|-btn|-title|-option|-input/, '');
@@ -21,9 +21,6 @@ export class UIManager {
             if (element.tagName === 'INPUT' && element.placeholder) {
                 element.placeholder = this.translations.get(lang, `${key}Placeholder`);
             }
-        });
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(lang));
         });
     }
 
@@ -38,7 +35,7 @@ export class UIManager {
 
     showAlert(message, type = 'success') {
         const alerts = document.getElementById('alerts');
-        alerts.innerHTML = `<div class="alert-${type}">${this.translations.get(document.documentElement.lang, message)}</div>`;
+        alerts.innerHTML = `<div class="alert-${type}">${this.translations.get('en', message)}</div>`;
         setTimeout(() => alerts.innerHTML = '', 3000);
     }
 
@@ -55,7 +52,7 @@ export class UIManager {
             const strength = this.passwordGenerator.checkStrength(password);
             document.getElementById('password-output').textContent = password;
             document.getElementById('password-strength-info').innerHTML = 
-                `<span class="password-strength ${strength.class}">${this.translations.get(document.documentElement.lang, 'strengthLabel')} ${this.translations.get(document.documentElement.lang, strength.text)}</span>`;
+                `<span class="password-strength ${strength.class}">${this.translations.get('en', 'strengthLabel')} ${this.translations.get('en', strength.text)}</span>`;
             document.getElementById('generated-password').classList.remove('hidden');
         } catch (e) {
             this.showAlert(e.message, 'error');
@@ -104,11 +101,11 @@ export class UIManager {
                 <div class="password-item">
                     <div class="flex justify-between items-center mb-2">
                         <span class="account-name">${item.account}</span>
-                        <button class="btn bg-indigo-500 text-white py-1 px-3 rounded-lg hover:bg-indigo-600 transition-all" onclick="navigator.clipboard.writeText('${item.password}').then(() => app.showAlert('successCopied'))">${this.translations.get(document.documentElement.lang, 'copyBtnShort')}</button>
+                        <button class="btn bg-purple-500 text-white py-1 px-3 rounded-lg hover:bg-purple-600 transition-all" onclick="navigator.clipboard.writeText('${item.password}').then(() => app.showAlert('successCopied'))">${this.translations.get('en', 'copyBtnShort')}</button>
                     </div>
                     <div class="password-display">${item.password}</div>
                 </div>`).join('')
-            : `<div class="empty-state">${this.translations.get(document.documentElement.lang, 'noPasswords')}</div>`;
+            : `<div class="empty-state">${this.translations.get('en', 'noPasswords')}</div>`;
     }
 
     searchPasswords() {
@@ -120,17 +117,17 @@ export class UIManager {
                 <div class="password-item">
                     <div class="flex justify-between items-center mb-2">
                         <span class="account-name">${item.account}</span>
-                        <button class="btn bg-indigo-500 text-white py-1 px-3 rounded-lg hover:bg-indigo-600 transition-all" onclick="navigator.clipboard.writeText('${item.password}').then(() => app.showAlert('successCopied'))">${this.translations.get(document.documentElement.lang, 'copyBtnShort')}</button>
+                        <button class="btn bg-purple-500 text-white py-1 px-3 rounded-lg hover:bg-purple-600 transition-all" onclick="navigator.clipboard.writeText('${item.password}').then(() => app.showAlert('successCopied'))">${this.translations.get('en', 'copyBtnShort')}</button>
                     </div>
                     <div class="password-display">${item.password}</div>
                 </div>`).join('')
-            : `<div class="empty-state">${this.translations.get(document.documentElement.lang, 'noResults')}</div>`;
+            : `<div class="empty-state">${this.translations.get('en', 'noResults')}</div>`;
     }
 
     loadAccountData() {
         const select = document.getElementById('manage-account');
         const accounts = this.passwordManager.getAllPasswords();
-        select.innerHTML = `<option value="" id="select-account-option">${this.translations.get(document.documentElement.lang, 'selectAccountOption')}</option>` +
+        select.innerHTML = `<option value="" id="select-account-option">${this.translations.get('en', 'selectAccountOption')}</option>` +
             accounts.map(item => `<option value="${item.account}">${item.account}</option>`).join('');
         const editForm = document.getElementById('edit-form');
         editForm.classList.add('hidden');
@@ -167,7 +164,7 @@ export class UIManager {
             this.showAlert('errorAccountRequired', 'error');
             return;
         }
-        if (confirm(`${this.translations.get(document.documentElement.lang, 'confirmDelete')} ${account}?`)) {
+        if (confirm(`${this.translations.get('en', 'confirmDelete')} ${account}?`)) {
             try {
                 this.passwordManager.deletePassword(account);
                 this.showAlert('successDeleted');
@@ -181,5 +178,9 @@ export class UIManager {
     togglePasswordVisibility(inputId) {
         const input = document.getElementById(inputId);
         input.type = input.type === 'password' ? 'text' : 'password';
+        const button = input.nextElementSibling;
+        if (button && button.tagName === 'BUTTON') {
+            button.textContent = input.type === 'password' ? 'Show' : 'Hide';
+        }
     }
 }

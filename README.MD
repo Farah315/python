@@ -70,6 +70,11 @@ pytest test_project.py
 - Keep your `secret.key` file secure; it is essential for encrypting and decrypting your passwords.  
 - Regularly update your passwords for better security.  
  
-# 🔐 Password Manager  
 
-#### Enjoy and stay secure with Farah 🐈
+## Screenshots from the Website
+
+![genarate](image.png)
+![save](image-1.png)
+![view](image-2.png)
+![manage](image-3.png)
+#### Enjoy and stay secure with Farah 🐈

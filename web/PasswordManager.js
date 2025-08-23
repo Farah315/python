@@ -1,6 +1,7 @@
 export class PasswordManager {
     constructor() {
         this.passwords = new Map();
+        this.users = new Map();
         this.encryptionKey = this.generateEncryptionKey();
         this.loadFromStorage();
     }
@@ -30,6 +31,19 @@ export class PasswordManager {
         } catch (e) {
             return encryptedText;
         }
+    }
+
+    registerUser(username, password) {
+        if (!username || !password) throw new Error('errorFillFields');
+        if (this.users.has(username)) throw new Error('errorUserExists');
+        this.users.set(username, this.encrypt(password));
+        this.saveUsersToStorage();
+    }
+
+    validateUser(username, password) {
+        const encryptedPassword = this.users.get(username);
+        if (!encryptedPassword) return false;
+        return this.decrypt(encryptedPassword) === password;
     }
 
     savePassword(account, password) {
@@ -79,17 +93,29 @@ export class PasswordManager {
         localStorage.setItem('pm_passwords', JSON.stringify(data));
     }
 
+    saveUsersToStorage() {
+        const data = Object.fromEntries(this.users);
+        localStorage.setItem('pm_users', JSON.stringify(data));
+    }
+
     loadFromStorage() {
         try {
-            const data = localStorage.getItem('pm_passwords');
-            if (data) {
-                const parsed = JSON.parse(data);
+            const passwordData = localStorage.getItem('pm_passwords');
+            if (passwordData) {
+                const parsed = JSON.parse(passwordData);
                 for (const [account, encryptedPassword] of Object.entries(parsed)) {
                     this.passwords.set(account, encryptedPassword);
                 }
             }
+            const userData = localStorage.getItem('pm_users');
+            if (userData) {
+                const parsed = JSON.parse(userData);
+                for (const [username, encryptedPassword] of Object.entries(parsed)) {
+                    this.users.set(username, encryptedPassword);
+                }
+            }
         } catch (e) {
-            console.error('Error loading passwords:', e);
+            console.error('Error loading data:', e);
         }
     }
 }
